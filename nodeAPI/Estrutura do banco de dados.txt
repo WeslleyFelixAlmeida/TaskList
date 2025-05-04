@@ -1,0 +1,62 @@
+CREATE DATABASE tasklistdb;
+
+#Primeiro bloco
+#Tabela "usuarios":
+CREATE TABLE usuarios(
+    id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    nomeUsuario VARCHAR(225) NOT NULL,
+    senhaUsuario VARCHAR(225) NOT NULL,
+    horaCriacao DATE
+);
+
+#Tabela "statusTarefas":
+CREATE TABLE statusTarefas(
+    id INT PRIMARY KEY NOT NULL,
+    nome VARCHAR(100)
+);
+
+INSERT INTO statusTarefas VALUES 
+(1, "Em aberto"),
+(2, "Finalizada"),
+(3, "Expirada"),
+(4, "Tempo de expiração próximo");
+
+#----------------------------------------------------------------
+
+#Segundo bloco:
+#Tabela "tarefas":
+CREATE TABLE tarefas(
+    id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    titulo VARCHAR(255) NOT NULL,
+    descricao TEXT NOT NULL,
+    statusID INT,
+    idUsuario INT,
+    dataInicioTarefa DATE,
+    dataFimTarefa DATE,
+    CONSTRAINT fk_idUsuario FOREIGN KEY (idUsuario) REFERENCES usuarios(id) ON DELETE CASCADE,
+    CONSTRAINT fk_statusTarefa FOREIGN KEY (statusID) REFERENCES statusTarefas(id)
+);
+
+#Tabela "userLogged":
+CREATE TABLE userLogged(
+    id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    keyUsuario VARCHAR(30) NOT NULL,
+    horaCriacao DATETIME,
+    horaFinalizacao DATETIME,
+    idUsuario INT,
+    CONSTRAINT fk_idUsuario_logged FOREIGN KEY (idUsuario) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+
+#EVENTO PARA ATUALIZAR O STATUS DAS TAREFAS DIARIAMENTE:
+
+CREATE EVENT IF NOT EXISTS atualizar_tarefas_expiradas
+ON SCHEDULE EVERY 1 DAY
+DO
+  UPDATE tarefas
+  SET statusID = CASE
+    WHEN dataFimTarefa < CURDATE() AND statusID != 2 THEN 3  -- Expirada (statusID = 3)
+    WHEN dataFimTarefa BETWEEN CURDATE() AND CURDATE() + INTERVAL 3 DAY AND statusID != 2 THEN 4  -- Tempo de expiração próximo (statusID = 4)
+    ELSE statusID
+  END
+  WHERE statusID != 2;  -- Não altera tarefas finalizadas (statusID = 2)
