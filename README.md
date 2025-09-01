@@ -1,5 +1,6 @@
-- TaskList
-Uma aplicação web completa para gerenciamento de tarefas desenvolvida com tecnologias modernas do front-end e back-end.
+TaskList
+
+O Tasklist é uma aplicação web completa para gerenciamento de tarefas desenvolvida com tecnologias modernas do front-end e back-end.
 Descrição
 O TaskList é uma solução para organização e acompanhamento de tarefas pessoais ou profissionais. A aplicação oferece uma interface intuitiva e funcionalidades completas de CRUD (Create, Read, Update, Delete) para gerenciar suas atividades de forma eficiente.
 Tecnologias Utilizadas
